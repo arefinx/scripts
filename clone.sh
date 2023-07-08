@@ -1,60 +1,59 @@
 #!/bin/bash
 
-function clone_mojito () {
-        read -p "Select branch name : " BRANCH ; echo ""
-        DM=$PWD/device/xiaomi/mojito
-        VM=$PWD/vendor/xiaomi/mojito
-        KM=$PWD/kernel/xiaomi/mojito
-        echo "Cloning resources for mojito"
-        git clone https://github.com/axsrog/device_xiaomi_mojito -b $BRANCH $DM
-        echo ""
-        git clone https://github.com/axsrog/vendor_xiaomi_mojito -b $BRANCH $VM
-        echo ""
-        git clone https://github.com/axsrog/kernel_xiaomi_mojito -b $BRANCH $KM
-        echo ""
+# Function to display colored text
+print_message() {
+    if [ "$2" == "success" ]; then
+        echo -e "\e[32m$1\e[0m"  # Green color for success
+    elif [ "$2" == "failure" ]; then
+        echo -e "\e[31m$1\e[0m"  # Red color for failure
+    else
+        echo "$1"
+    fi
 }
 
-function clone_lavender () {
-        read -p "Select branch name : " BRANCH ; echo ""
-        DL=$PWD/device/xiaomi/lavender
-        VL=$PWD/vendor/xiaomi/lavender
-        KL=$PWD/kernel/xiaomi/lavender
+# Prompt for device and branch
+read -p "Enter device: " DEVICE
+read -p "Enter branch: " BRANCH
 
-        read -p "Clone bionic? (y/n) : " bionic
-        if [[ $bionic == y ]]
-        then
-        rm -rf bionic ; echo "Cloning bionic" ;
-        git clone https://github.com/axsrog/bionic
-        else
-        echo "Not cloning bionic"
-        fi
+# Set repository paths
+DD="device/xiaomi/$DEVICE"
+KD="kernel/xiaomi/$DEVICE"
+VD="vendor/xiaomi/$DEVICE"
 
-        echo "Cloning resources for lavender"
-        git clone https://github.com/axsrog/device_xiaomi_lavender -b $BRANCH $DL
-        echo ""
-        git clone https://github.com/axsrog/vendor_xiaomi_lavender -b $BRANCH $VL
-        echo ""
-        git clone https://github.com/axsrog/kernel_xiaomi_lavender -b $BRANCH $KL
-        echo ""
+# Clone device repository
+print_message "Cloning device repository..." "info"
+git clone "https://github.com/axsrog/device_xiaomi_$DEVICE" -b "$BRANCH" "$DD"
+if [ $? -eq 0 ]; then
+    print_message "Device repository cloned successfully!" "success"
+else
+    print_message "Failed to clone device repository." "failure"
+fi
 
-}
+# Clone kernel repository
+print_message "Cloning kernel repository..." "info"
+git clone "https://github.com/axsrog/kernel_xiaomi_$DEVICE" -b "$BRANCH" "$KD"
+if [ $? -eq 0 ]; then
+    print_message "Kernel repository cloned successfully!" "success"
+else
+    print_message "Failed to clone kernel repository." "failure"
+fi
 
-read -p "Select required device (1=mojito, 2=lavender) : " DEVICE
-      case $DEVICE in
-          1 )
-                   echo ""
-                   echo "cloning resources for mojito"
-                   echo ""
-                   clone_mojito ;;
+# Clone vendor repository
+print_message "Cloning vendor repository..." "info"
+git clone "https://github.com/axsrog/vendor_xiaomi_$DEVICE" -b "$BRANCH" "$VD"
+if [ $? -eq 0 ]; then
+    print_message "Vendor repository cloned successfully!" "success"
+else
+    print_message "Failed to clone vendor repository." "failure"
+fi
 
-          2 )
-                   echo ""
-                   echo "cloning resources for lavender"
-                   echo ""
-                   clone_lavender ;;
-
-          * )
-                   echo "error: 404"
-
-      esac
-exit 0
+# Clone bionic repository if device is "lavender"
+if [ "$DEVICE" == "lavender" ]; then
+    print_message "Cloning bionic repository..." "info"
+    git clone "https://github.com/axsrog/bionic"
+    if [ $? -eq 0 ]; then
+        print_message "Bionic repository cloned successfully!" "success"
+    else
+        print_message "Failed to clone bionic repository." "failure"
+    fi
+fi
