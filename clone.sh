@@ -14,6 +14,7 @@ print_message() {
 # Prompt for device and branch
 read -p "Enter device: " DEVICE
 read -p "Enter branch: " BRANCH
+read -p "Enter author: " AUTHOR
 
 # Set repository paths
 DD="device/xiaomi/$DEVICE"
@@ -22,7 +23,7 @@ VD="vendor/xiaomi/$DEVICE"
 
 # Clone device repository
 print_message "Cloning device repository..." "info"
-git clone "https://github.com/axsrog/device_xiaomi_$DEVICE" -b "$BRANCH" "$DD"
+git clone "https://github.com/$AUTHOR/device_xiaomi_$DEVICE" -b "$BRANCH" "$DD"
 if [ $? -eq 0 ]; then
     print_message "Device repository cloned successfully!" "success"
 else
@@ -31,7 +32,7 @@ fi
 
 # Clone kernel repository
 print_message "Cloning kernel repository..." "info"
-git clone "https://github.com/axsrog/kernel_xiaomi_$DEVICE" -b "$BRANCH" "$KD"
+git clone "https://github.com/$AUTHOR/kernel_xiaomi_$DEVICE" -b "$BRANCH" "$KD"
 if [ $? -eq 0 ]; then
     print_message "Kernel repository cloned successfully!" "success"
 else
@@ -40,20 +41,9 @@ fi
 
 # Clone vendor repository
 print_message "Cloning vendor repository..." "info"
-git clone "https://github.com/axsrog/vendor_xiaomi_$DEVICE" -b "$BRANCH" "$VD"
+git clone "https://github.com/$AUTHOR/vendor_xiaomi_$DEVICE" -b "$BRANCH" "$VD"
 if [ $? -eq 0 ]; then
     print_message "Vendor repository cloned successfully!" "success"
 else
     print_message "Failed to clone vendor repository." "failure"
-fi
-
-# Clone bionic repository if device is "lavender"
-if [ "$DEVICE" == "lavender" ]; then
-    print_message "Cloning bionic repository..." "info"
-    git clone "https://github.com/axsrog/bionic"
-    if [ $? -eq 0 ]; then
-        print_message "Bionic repository cloned successfully!" "success"
-    else
-        print_message "Failed to clone bionic repository." "failure"
-    fi
 fi
